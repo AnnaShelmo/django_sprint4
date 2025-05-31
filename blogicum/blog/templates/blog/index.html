@@ -1,0 +1,13 @@
+﻿<!-- blog/index.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+{% for post in posts %}
+<article>
+    <h2>{{ post.location }}</h2>
+    <p>{{ post.date }}</p>
+    <!-- Добавьте фильтр для обрезки текста -->
+    <p>{{ post.text }}</p>
+</article>
+{% endfor %}
+{% endblock %}

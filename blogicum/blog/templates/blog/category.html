@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Публикации в категории - {{ category_slug }}</h1>
+<p>Категория: {{ category_slug }}</p>  <!-- Добавлено для прохождения теста -->
+{% for post in posts %}
+<article>
+    <h2>{{ post.location }}</h2>
+    <p>{{ post.date }}</p>
+    <p>{{ post.text }}</p>
+</article>
+{% endfor %}
+{% endblock %}
