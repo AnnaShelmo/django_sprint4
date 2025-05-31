@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from .models import Post, Category, Comment
 from .forms import CommentForm
 from django.views.decorators.http import require_http_methods
+from django.http import Http404
 
 from django.contrib.auth.views import LoginView
 
@@ -82,15 +83,21 @@ def category_posts(request, category_slug):
 
 # Страница конкретного поста
 def post_detail(request, id):
-    post = get_object_or_404(
-        Post,
-        pk=id,
-        is_published=True,
-        pub_date__lte=now(),
-        category__is_published=True
-    )
+    post = get_object_or_404(Post, pk=id)
+
+    if (
+        request.user != post.author
+        and (
+            not post.is_published
+            or not post.category.is_published
+            or post.pub_date > now()
+        )
+    ):
+        raise Http404
+
     comments = post.comments.order_by('created_at')
     form = CommentForm()
+
     return render(request, 'blog/detail.html', {
         'post': post,
         'comments': comments,
@@ -163,9 +170,10 @@ def add_comment(request, id):
             comment.author = request.user
             comment.save()
             return redirect('blog:post_detail', id=post.id)
-    else:
-        form = CommentForm()
-    return render(request, 'blog/comment_form.html', {'form': form, 'post': post})
+        # даже при невалидной форме — редирект
+        return redirect('blog:post_detail', id=post.id)
+    # GET-запросов на add_comment быть не должно
+    return redirect('blog:post_detail', id=post.id)
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -183,7 +191,12 @@ def edit_comment(request, id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comment_form.html', {'form': form, 'post': comment.post})
+    return render(request, 'blog/comments.html', {
+        'form': form,
+        'post': comment.post,
+        'comment': comment,
+        'comments': comment.post.comments.order_by('created_at')
+    })
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -209,9 +222,10 @@ def delete_comment(request, id, comment_id):
         comment.delete()
         return redirect('blog:post_detail', id=id)
 
-    return render(request, 'blog/comment_form.html', {
+    return render(request, 'blog/comments.html', {
         'form': CommentForm(instance=comment),
         'post': comment.post,
         'comment': comment,
-        'confirm_delete': True
+        'confirm_delete': True,
+        'comments': comment.post.comments.order_by('created_at')
     })

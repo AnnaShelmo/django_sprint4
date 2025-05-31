@@ -130,7 +130,7 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'blog:profile'  # или другой путь, куда хочешь редиректить после входа
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = Path(os.path.join(BASE_DIR, 'sent_emails'))
