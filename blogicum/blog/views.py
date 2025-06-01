@@ -96,12 +96,12 @@ def post_detail(request, id):
         raise Http404
 
     comments = post.comments.order_by('created_at')
-    form = CommentForm()
+    form = CommentForm()  # Одна универсальная форма
 
     return render(request, 'blog/detail.html', {
         'post': post,
         'comments': comments,
-        'form': form,
+        'form': form,  # Одна форма для добавления/редактирования
     })
 
 # Форма создания поста
@@ -191,12 +191,13 @@ def edit_comment(request, id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comments.html', {
+    return render(request, 'includes/comments.html', {
         'form': form,
         'post': comment.post,
         'comment': comment,
         'comments': comment.post.comments.order_by('created_at')
     })
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -215,6 +216,7 @@ def delete_post(request, id):
 @require_http_methods(["GET", "POST"])
 def delete_comment(request, id, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id, post__pk=id)
+
     if request.user != comment.author:
         return redirect('blog:post_detail', id=id)
 
@@ -222,10 +224,10 @@ def delete_comment(request, id, comment_id):
         comment.delete()
         return redirect('blog:post_detail', id=id)
 
-    return render(request, 'blog/comments.html', {
+    return render(request, 'includes/comments.html', {
         'form': CommentForm(instance=comment),
         'post': comment.post,
         'comment': comment,
+        'comments': comment.post.comments.order_by('created_at'),
         'confirm_delete': True,
-        'comments': comment.post.comments.order_by('created_at')
     })

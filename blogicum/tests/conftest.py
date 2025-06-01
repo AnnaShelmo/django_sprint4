@@ -285,9 +285,7 @@ def get_create_a_post_get_response_safely(user_client: Client) -> HttpResponse:
 def _testget_context_item_by_class(
         context, cls: type, err_msg: str, inside_iter: bool = False
 ) -> KeyVal:
-    """If `err_msg` is not empty, empty return value will
-    produce an AssertionError with the `err_msg` error message"""
-
+    """Поиск первого элемента типа `cls` в контексте. Обрабатывает список контекстов."""
     def is_a_match(val: Any):
         if inside_iter:
             try:
@@ -297,12 +295,24 @@ def _testget_context_item_by_class(
         else:
             return isinstance(val, cls)
 
+    # Приводим context к словарю
+    context_dict = {}
+    if isinstance(context, list):
+        for ctx in context:
+            if isinstance(ctx, dict):
+                context_dict.update(ctx)
+    elif isinstance(context, dict):
+        context_dict = context
+    else:
+        raise TypeError("Некорректный тип context. Ожидался dict или list[dict].")
+
     matched_keyval: KeyVal = KeyVal(key=None, val=None)
     matched_keyvals: List[KeyVal] = []
-    for key, val in dict(context).items():
+    for key, val in context_dict.items():
         if is_a_match(val):
             matched_keyval = KeyVal(key, val)
             matched_keyvals.append(matched_keyval)
+
     if err_msg:
         assert len(matched_keyvals) == 1, err_msg
         assert matched_keyval.key, err_msg
