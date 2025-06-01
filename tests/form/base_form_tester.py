@@ -104,7 +104,8 @@ class BaseFormTester(BaseTester):
 
     @property
     @abstractmethod
-    def has_textarea(self): ...
+    def has_textarea(self):
+        ...
 
     @property
     def unauthorized_edit_redirect_cbk(self):

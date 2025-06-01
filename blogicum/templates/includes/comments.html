@@ -1,30 +1,13 @@
-{% load django_bootstrap5 %}
-
-<h1 class="mb-4">
-  {% if confirm_delete %}
-    Удалить комментарий
-  {% elif comment %}
-    Редактировать комментарий
-  {% else %}
-    Добавить комментарий
-  {% endif %}
-</h1>
-
 {% if user.is_authenticated %}
-  <form method="post"
-        action="{% if confirm_delete %}{% url 'blog:delete_comment' post.id comment.id %}{% elif comment %}{% url 'blog:edit_comment' post.id comment.id %}{% else %}{% url 'blog:add_comment' post.id %}{% endif %}">
+  {% load django_bootstrap5 %}
+  <h5 class="mb-4">Оставить комментарий</h5>
+  <form method="post" action="{% url 'blog:add_comment' post.id %}">
     {% csrf_token %}
-    {% if confirm_delete %}
-      <p>Вы уверены, что хотите удалить комментарий?</p>
-    {% else %}
-      {% bootstrap_form form %}
-    {% endif %}
-    {% bootstrap_button button_type="submit" content=confirm_delete|yesno:"Удалить,Сохранить" %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type="submit" content="Отправить" %}
   </form>
 {% endif %}
-
-<hr><br>
-
+<br>
 {% for comment in comments %}
   <div class="media mb-4">
     <div class="media-body">
@@ -37,7 +20,7 @@
       <br>
       {{ comment.text|linebreaksbr }}
     </div>
-    {% if request.user == comment.author %}
+    {% if user == comment.author %}
       <a class="btn btn-sm text-muted" href="{% url 'blog:edit_comment' post.id comment.id %}" role="button">
         Отредактировать комментарий
       </a>

@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-sent_emails/
 
 # C extensions
 *.so
@@ -149,5 +148,5 @@ dmypy.json
 # папки со статикой и медиа
 media/
 
+# папка с почтовыми сообщениями
 sent_emails/
-
