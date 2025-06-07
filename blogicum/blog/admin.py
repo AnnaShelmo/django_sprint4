@@ -1,62 +1,66 @@
 from django.contrib import admin
-from .models import Category, Location, Post
-
-# Установка отображения пустых значений в админке.
-admin.site.empty_value_display = 'Не задано'
+from .models import Post, Category, Location
 
 
-class PostInline(admin.TabularInline):
-    """
-    Определение Inline-класса, который используется
-    для создания встроенных форм для связанных объектов Post.
-    """
-
-    model = Post
-    # Количество дополнительных форм для ввода.
-    extra = 0
-
-
-class CategoryAdmin(admin.ModelAdmin):
-    """Класс администрирования для модели Category."""
-
-    inlines = (
-        PostInline,
-    )
-
-
-class LocationAdmin(admin.ModelAdmin):
-    """Класс администрирования для модели Location."""
-
-    inlines = (
-        PostInline,
-    )
-
-
+@admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    """Класс администрирования для модели Post."""
-
     list_display = (
-        'title',
-        'text',
-        'pub_date',
-        'author',
-        'location',
-        'category',
-        'is_published',
-        'created_at'
+        "title",
+        "author",
+        "pub_date",
+        "category",
+        "location",
+        "is_published",
     )
-    list_editable = (
-        'author',
-        'location',
-        'category',
-        'is_published'
+    list_filter = (
+        "is_published",
+        "pub_date",
+        "category",
+        "location",
+        "author",
     )
-    search_fields = ('title',)
-    list_filter = ('is_published',)
-    list_display_links = ('title',)
+    search_fields = ("title", "text")
+    date_hierarchy = "pub_date"
+    ordering = ("-pub_date",)
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "text",
+                    "author",
+                    "category",
+                    "location",
+                    "is_published",
+                )
+            },
+        ),
+        (
+            "Дополнительно",
+            {
+                "fields": ("pub_date", "created_at"),
+                "classes": ("collapse",),
+            },
+        ),
+    )
+    readonly_fields = ("created_at",)
 
 
-# Регистрация моделей в админке.
-admin.site.register(Post, PostAdmin)
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Location, LocationAdmin)
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("title", "slug", "is_published", "created_at")
+    prepopulated_fields = {"slug": ("title",)}
+    list_filter = ("is_published",)
+    search_fields = ("title", "description")
+    ordering = ("title",)
+    readonly_fields = ("created_at",)
+
+
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ("name", "is_published", "created_at")
+    list_filter = ("is_published",)
+    search_fields = ("name",)
+    ordering = ("name",)
+    readonly_fields = ("created_at",)
