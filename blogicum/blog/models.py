@@ -95,10 +95,6 @@ class Post(models.Model):
         upload_to="posts/", blank=True, null=True, verbose_name="Изображение"
     )
 
-    @property
-    def comment_count(self):
-        return self.comments.count()
-
     class Meta:
         verbose_name = "публикация"
         verbose_name_plural = "Публикации"
