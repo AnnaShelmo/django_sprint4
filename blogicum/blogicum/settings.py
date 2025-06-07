@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Путь к вашей папке static
+    BASE_DIR / "static",  # Путь к папке static
 ]
 
 # Quick-start development settings - unsuitable for production
@@ -131,7 +131,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 LOGIN_URL = "/auth/login/"
 LOGIN_REDIRECT_URL = (
-    "blog:profile"  # или другой путь, куда хочешь редиректить после входа
+    "blog:profile"  
 )
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"

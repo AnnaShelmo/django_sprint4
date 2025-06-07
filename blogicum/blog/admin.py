@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Category, Location
+from .models import Post, Category, Location, Comment
 
 
 @admin.register(Post)
@@ -64,3 +64,10 @@ class LocationAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     ordering = ("name",)
     readonly_fields = ("created_at",)
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('author', 'post', 'created_at', 'text')
+    search_fields = ('author__username', 'text')
+    list_filter = ('created_at',)

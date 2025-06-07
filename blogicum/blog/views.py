@@ -12,12 +12,12 @@ from .forms import CommentForm
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
 
 
 class CustomLoginView(LoginView):
     def get_success_url(self):
-        return f"/profile/{self.request.user.username}/"
-
+        return reverse_lazy("blog:profile", kwargs={"username": self.request.user.username})
 
 # Регистрация пользователя
 class UserRegisterView(CreateView):
@@ -193,16 +193,12 @@ def edit_comment(request, id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(
-        request,
-        "includes/comments.html",
-        {
-            "form": form,
-            "post": comment.post,
-            "comment": comment,
-            "comments": comment.post.comments.order_by("created_at"),
-        },
-    )
+    return render(request, "blog/detail.html", {
+        "form": form,
+        "post": comment.post,
+        "comment": comment,
+        "comments": comment.post.comments.order_by("created_at"),
+    })
 
 
 @login_required
@@ -233,14 +229,9 @@ def delete_comment(request, id, comment_id):
         comment.delete()
         return redirect("blog:post_detail", id=id)
 
-    return render(
-        request,
-        "includes/comments.html",
-        {
-            "form": CommentForm(instance=comment),
-            "post": comment.post,
-            "comment": comment,
-            "comments": comment.post.comments.order_by("created_at"),
-            "confirm_delete": True,
-        },
-    )
+    return render(request, "blog/detail.html", {
+        "post": comment.post,
+        "comment": comment,
+        "comments": comment.post.comments.order_by("created_at"),
+        "confirm_delete": True,
+    })
